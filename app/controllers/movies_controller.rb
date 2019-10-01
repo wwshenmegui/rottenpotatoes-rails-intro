@@ -27,7 +27,6 @@ class MoviesController < ApplicationController
       if @selected_ratings==nil
         @selected_ratings=@all_ratings
       end
-      #need_redirect=true
     else
       if(@selected_ratings.kind_of?(Hash))
         @selected_ratings = @selected_ratings.keys
@@ -36,7 +35,7 @@ class MoviesController < ApplicationController
     session[:ratings]=@selected_ratings
     
     #Determine how to sort
-    @movies = Movie.where(["rating in (?)",@selected_ratings]).order @sort_method
+    @movies = Movie.find(@selected_ratings).order @sort_method
   end
 
   def new
