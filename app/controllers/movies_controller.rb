@@ -12,17 +12,29 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings=Movie.all_ratings
-    @sort_method=params['sort_by']
+    @sort_method=params[:sort_by]
+    
+    #Determine how to sort
+    if @sort_method==nil
+      @sort_method=session[:sort_by]
+    end
+    session[:sort_by]=@sort_method
     
     #Determine what to filter
     @selected_ratings=params[:ratings]
-    if @selected_ratings==nil
-      @selected_ratings=@all_ratings
+    if(@selected_ratings==nil||@selected_ratings.empty?)
+      @selected_ratings=session[:ratings]
+      if @selected_ratings==nil
+        @selected_ratings=@all_ratings
+      end
+      #need_redirect=true
     else
       if(@selected_ratings.kind_of?(Hash))
         @selected_ratings = @selected_ratings.keys
       end
     end
+    session[:ratings]=@selected_ratings
+    
     #Determine how to sort
     @movies = Movie.where(["rating in (?)",@selected_ratings]).order @sort_method
   end
