@@ -14,9 +14,15 @@ class MoviesController < ApplicationController
     @all_ratings=Movie.all_ratings
     @sort_method=params[:sort_by]
     
+    #If there is no param and session is not nil, we need to redirect
+    need_redirect=false
+    
     #Determine how to sort
     if @sort_method==nil
       @sort_method=session[:sort_by]
+      if @sort_method!=params[:sort_by]
+        need_redirect=true
+      end
     end
     session[:sort_by]=@sort_method
     
@@ -26,6 +32,8 @@ class MoviesController < ApplicationController
       @selected_ratings=session[:ratings]
       if @selected_ratings==nil
         @selected_ratings=@all_ratings
+      else
+        need_redirect=true
       end
     else
       if(@selected_ratings.kind_of?(Hash))
@@ -34,8 +42,13 @@ class MoviesController < ApplicationController
     end
     session[:ratings]=@selected_ratings
     
+    if need_redirect
+      flash.keep
+      redirect_to movies_path(:sort_by=>@sort_method,:ratings=>@selected_ratings)
+    end
+    
     #Determine how to sort
-    @movies = Movie.find(@selected_ratings).order @sort_method
+    @movies = Movie.find_by_ratings(@selected_ratings).order(@sort_method)
   end
 
   def new

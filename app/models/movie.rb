@@ -3,7 +3,7 @@ class Movie < ActiveRecord::Base
         ['G','PG','PG-13','R']
     end
     
-    def self.find ratings
-        @movies= Movie.where(["rating in (?)",ratings])
+    def self.find_by_ratings ratings
+        @movies= Movie.uniq.where(["rating in (?)",ratings])
     end
 end
